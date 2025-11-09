@@ -18,6 +18,18 @@ export function initLoggedInUser(): void {
 }
 
 export async function updateUserInfo(): Promise<[boolean, number]> {
+// 🟢 오프라인 모드 자동 로그인 스킵
+if (localStorage.getItem("autoOffline") === "true") {
+  console.log("🟢 오프라인 모드 감지됨 - 자동 게스트 로그인 적용됨");
+  loggedInUser = {
+    username: "Guest",
+    lastSessionSlot: -1,
+    discordId: "",
+    googleId: "",
+    hasAdminRole: false,
+  };
+  return [true, 200];
+}
   if (bypassLogin) {
     loggedInUser = {
       username: "Guest",
