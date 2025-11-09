@@ -3,83 +3,20 @@
 
 <head>
 <script>
-// 자동 오프라인+자동 시작 패치
-(function(){
-  console.log("📱 PokéRogue 자동오프라인+자동시작 스크립트 로드");
+  // 🌐 오프라인 모드 활성화
+  localStorage.setItem("autoOffline", "true");
+  console.log("✅ 오프라인 모드: 로그인 없이 바로 실행합니다.");
 
-  // 강제 오프라인 플래그 & 기본 세이브
-  try {
-    localStorage.setItem("autoOffline", "true");
-    if (!localStorage.getItem("saveData")) {
-      const defaultSave = {
-        version: "custom_offline_v1",
-        player: { name: "GuestTiger", badges: 0 },
-        progress: { area: "Start", mode: "Mystery" }
-      };
-      localStorage.setItem("saveData", JSON.stringify(defaultSave));
-    }
-  } catch(e) { console.warn("localStorage 오류:", e); }
-
-  // 로그인 UI 숨김 시도 (선제)
-  function hideLoginUI(){
-    const selectors = [
-      "form", ".login-container", "#login", ".login-box", ".auth", ".login"
-    ];
-    selectors.forEach(s => {
-      document.querySelectorAll(s).forEach(el => {
-        try { el.style.display = "none"; } catch(e){}
-      });
-    });
+  // 💾 기본 세이브 데이터 생성 (최초 실행 시)
+  if (!localStorage.getItem("saveData")) {
+    const defaultSave = {
+      version: "custom_offline_v1",
+      player: { name: "GuestTiger", badges: 0 },
+      progress: { area: "Start", mode: "Mystery" },
+    };
+    localStorage.setItem("saveData", JSON.stringify(defaultSave));
+    console.log("📁 기본 세이브 데이터 생성됨");
   }
-
-  // startGame이 준비되면 호출
-  let attempts = 0;
-  const maxAttempts = 200; // 200 * 100ms = 20초 최대 대기
-  const iv = setInterval(() => {
-    attempts++;
-    // 숨김 시도 반복
-    hideLoginUI();
-
-    // 함수가 준비되어 있으면 실행
-    if (typeof window.startGame === "function") {
-      try {
-        console.log("✅ startGame() 발견 — 자동 실행");
-        clearInterval(iv);
-        // 호출 전에 짧게 지연주기(안정성)
-        setTimeout(() => {
-          try { window.startGame(); } catch(e) { console.error("startGame 실행오류:", e); }
-        }, 100);
-        return;
-      } catch(e){ console.error(e); }
-    }
-
-    // 혹시 모듈이 익스포트된 형태면 시도 (export default game.start 등)
-    if (window.game && typeof window.game.start === "function") {
-      clearInterval(iv);
-      setTimeout(() => {
-        try { window.game.start(); } catch(e){ console.error("game.start 오류:", e); }
-      }, 100);
-      return;
-    }
-
-    // 타이틀 버튼이 있을 때 클릭으로 우회 (예: 로그인->시작 버튼)
-    const playBtn = document.querySelector("button.play, button#play, .btn-play, .start-button");
-    if (playBtn) {
-      clearInterval(iv);
-      setTimeout(()=>{ try { playBtn.click(); } catch(e){console.error(e);} }, 100);
-      return;
-    }
-
-    if (attempts >= maxAttempts) {
-      clearInterval(iv);
-      console.warn("자동 시작 시도 시간초과 — 수동 진입 필요(콘솔확인)");
-    }
-  }, 100);
-  
-  // DOM 변동 감지 시 로그인 UI 숨김 반복
-  const mo = new MutationObserver(hideLoginUI);
-  mo.observe(document, { childList: true, subtree: true });
-})();
 </script>
 	<meta charset="UTF-8" />
 	title>PokéRogue</title>
