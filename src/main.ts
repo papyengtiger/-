@@ -9,7 +9,19 @@ import BBCodeTextPlugin from "phaser3-rex-plugins/plugins/bbcodetext-plugin";
 import InputTextPlugin from "phaser3-rex-plugins/plugins/inputtext-plugin";
 import TransitionImagePackPlugin from "phaser3-rex-plugins/templates/transitionimagepack/transitionimagepack-plugin";
 import UIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin";
+// ✅ 오프라인 자동 실행 모드 강제 활성화
+localStorage.setItem("autoOffline", "true");
+console.log("✅ 오프라인 모드: 로그인 없이 바로 실행합니다.");
 
+if (!localStorage.getItem("saveData")) {
+  const defaultSave = {
+    version: "custom_offline_v1",
+    player: { name: "GuestTiger", badges: 0 },
+    progress: { area: "Start", mode: "Mystery" },
+  };
+  localStorage.setItem("saveData", JSON.stringify(defaultSave));
+  console.log("📁 기본 세이브 데이터 생성 완료");
+}
 // Catch global errors and display them in an alert so users can report the issue.
 window.onerror = (_message, _source, _lineno, _colno, error) => {
   console.error(error);
